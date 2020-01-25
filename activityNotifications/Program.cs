@@ -18,41 +18,41 @@ class Solution
     // Complete the activityNotifications function below.
     static int activityNotifications(int[] expenditure, int d)
     {
-        int n = expenditure.Length; //5
-        int i = d;  //3
+        int n = expenditure.Length;
+        int i = d;
         int notifications = 0;
-        List<int> lastExp = expenditure.Take(d).OrderBy(x => x).ToList();   //[10, 20,30]
+        List<int> lastExp = expenditure.Take(d).OrderBy(x => x).ToList();
         List<int> newLastExp = new List<int>();
 
         if (d % 2 != 0)
         {
-            int index = (d - 1) / 2; //1
+            int index = (d - 1) / 2;
             for (; i < n; i++)
             {
                 int exp = expenditure[i];
-                int median2 = 2 * lastExp[index];    //20
-                if (exp >= median2)    //40
+                int median2 = 2 * lastExp[index];
+                if (exp >= median2)
                 {
-                    Console.WriteLine(exp + " " + median2);
+                    //Console.WriteLine($"Exp: {exp}, 2*Med:{median2}");
                     notifications++;
                 }
-                for (int j = 1; j < lastExp.Count; j++)
+                for (int j = 0; j < d; j++)
                 {
                     if (exp < lastExp[j])
                     {
                         newLastExp.Clear();
-                        newLastExp.AddRange(lastExp.Skip(1).Take(j - 1));
+                        newLastExp.AddRange(lastExp.Take(j));
                         newLastExp.Add(exp);
-                        newLastExp.AddRange(lastExp.Skip(j).Take(j - 1));
+                        newLastExp.AddRange(lastExp.Skip(j).Take(d-j));
                         lastExp.Clear();
                         lastExp.AddRange(newLastExp);
                         break;
                     }
                 }
-                if (exp > lastExp[(lastExp.Count - 1)])
+                if (exp > lastExp[(d - 1)])
                 {
                     //newLastExp.Clear();
-                    List<int> newLastExp2 = new List<int>(lastExp.Skip(1).Take(lastExp.Count - 1));
+                    List<int> newLastExp2 = new List<int>(lastExp.Skip(1).Take(d - 1));
                     newLastExp2.Add(exp);
                     lastExp.Clear();
                     lastExp.AddRange(newLastExp2);
@@ -69,24 +69,27 @@ class Solution
                 int exp = expenditure[i];
                 int median2 = 2 * (lastExp[index1]+ lastExp[index2])/2;    //20
                 if (expenditure[i] >= median2)
+                {
+                    //Console.WriteLine($"Exp: {exp}, 2*Med:{median2}");
                     notifications++;
-                for (int j = 1; j < lastExp.Count; j++)
+                }
+                for (int j = 0; j < d; j++)
                 {
                     if (exp < lastExp[j])
                     {
                         newLastExp.Clear();
-                        newLastExp.AddRange(lastExp.Skip(1).Take(j - 1));
+                        newLastExp.AddRange(lastExp.Take(j));
                         newLastExp.Add(exp);
-                        newLastExp.AddRange(lastExp.Skip(j).Take(j - 1));
+                        newLastExp.AddRange(lastExp.Skip(j).Take(d - j));
                         lastExp.Clear();
                         lastExp.AddRange(newLastExp);
                         break;
                     }
                 }
-                if (exp > lastExp[(lastExp.Count - 1)])
+                if (exp > lastExp[(d - 1)])
                 {
                     //newLastExp.Clear();
-                    List<int> newLastExp2 = new List<int>(lastExp.Skip(1).Take(lastExp.Count - 1));
+                    List<int> newLastExp2 = new List<int>(lastExp.Skip(1).Take(d - 1));
                     newLastExp2.Add(exp);
                     lastExp.Clear();
                     lastExp.AddRange(newLastExp2);
@@ -109,7 +112,7 @@ class Solution
         int[] expenditure = Array.ConvertAll(Console.ReadLine().Split(' '), expenditureTemp => Convert.ToInt32(expenditureTemp))
         ;
         int result = activityNotifications(expenditure, d);
-
+        //Console.Clear();
         Console.WriteLine(result);
 
         //textWriter.Flush();
