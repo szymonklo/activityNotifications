@@ -21,79 +21,111 @@ class Solution
         int n = expenditure.Length;
         int i = d;
         int notifications = 0;
-        List<int> lastExp = expenditure.Take(d).OrderBy(x => x).ToList();
-        List<int> newLastExp = new List<int>();
+        int[] counters = new int[200];
+        //Queue queue = new Queue(expenditure.Take(d).ToArray());
 
         if (d % 2 != 0)
         {
-            int index = (d - 1) / 2;
+            for (i = 0; i < d; i++)
+            {
+                int exp = expenditure[i];
+                counters[exp]++;
+            }
+            int numToMed = 0;
+            int median = 0;
+            for (int j = 0; j < 200; j++)
+            {
+                numToMed += counters[j];
+                if (numToMed >= (d + 1) / 2)
+                {
+                    median = j;
+                    break;
+                }
+            }
             for (; i < n; i++)
             {
                 int exp = expenditure[i];
-                int median2 = 2 * lastExp[index];
-                if (exp >= median2)
+                int expToDelete = expenditure[i - d];
+                if (exp >= 2*median)
                 {
-                    //Console.WriteLine($"Exp: {exp}, 2*Med:{median2}");
+                    Console.WriteLine($"Exp: {exp}, 2*Med:{median}");
                     notifications++;
                 }
-                for (int j = 0; j < d; j++)
+                counters[exp]++;
+                counters[expToDelete]--;
+                numToMed = 0;
+                for (int j = 0; j < 200; j++)
                 {
-                    if (exp < lastExp[j])
+                    numToMed += counters[j];
+                    if (numToMed >= (d + 1) / 2)
                     {
-                        newLastExp.Clear();
-                        newLastExp.AddRange(lastExp.Take(j));
-                        newLastExp.Add(exp);
-                        newLastExp.AddRange(lastExp.Skip(j).Take(d-j));
-                        lastExp.Clear();
-                        lastExp.AddRange(newLastExp);
+                        median = j;
                         break;
                     }
-                }
-                if (exp > lastExp[(d - 1)])
-                {
-                    //newLastExp.Clear();
-                    List<int> newLastExp2 = new List<int>(lastExp.Skip(1).Take(d - 1));
-                    newLastExp2.Add(exp);
-                    lastExp.Clear();
-                    lastExp.AddRange(newLastExp2);
                 }
             }
         }
         else
         {
-            int index1 = d/2-1;
-            int index2 = d/2;
+            for (i = 0; i < d; i++)
+            {
+                int exp = expenditure[i];
+                counters[exp]++;
+            }
+            int numToMed = 0;
+            int median1 = 0;
+            int median2 = 0;
+            bool m1Found = false;
 
+            for (int j = 0; j < 200; j++)
+            {
+                numToMed += counters[j];
+                if (numToMed >= d/2 && numToMed >= d / 2 + 1)
+                {
+                    if (!m1Found)
+                        median1 = j;
+                    median2 = j;
+                    break;
+                }
+                else if (numToMed >= d / 2  && numToMed < d / 2 + 1)
+                {
+                    median1 = j;
+                    m1Found = true;
+                }
+            }
+            double median = 0.5*(median1 + median2);
+            //median /= 2;
             for (; i < n; i++)
             {
                 int exp = expenditure[i];
-                int median2 = 2 * (lastExp[index1]+ lastExp[index2])/2;    //20
-                if (expenditure[i] >= median2)
+                int expToDelete = expenditure[i - d];
+                if (exp >= 2 * median)
                 {
-                    //Console.WriteLine($"Exp: {exp}, 2*Med:{median2}");
+                    Console.WriteLine($"Exp: {exp}, 2*Med:{median}");
                     notifications++;
                 }
-                for (int j = 0; j < d; j++)
+                counters[exp]++;
+                counters[expToDelete]--;
+                numToMed = 0;
+                m1Found = false;
+                for (int j = 0; j < 200; j++)
                 {
-                    if (exp < lastExp[j])
+                    numToMed += counters[j];
+                    if (numToMed >= d / 2 && numToMed >= d / 2 + 1)
                     {
-                        newLastExp.Clear();
-                        newLastExp.AddRange(lastExp.Take(j));
-                        newLastExp.Add(exp);
-                        newLastExp.AddRange(lastExp.Skip(j).Take(d - j));
-                        lastExp.Clear();
-                        lastExp.AddRange(newLastExp);
+                        if (!m1Found)
+                            median1 = j;
+                        median2 = j;
                         break;
                     }
+                    else if (numToMed >= d / 2 && numToMed < d / 2 + 1)
+                    {
+                        median1 = j;
+                        m1Found = true;
+                    }
                 }
-                if (exp > lastExp[(d - 1)])
-                {
-                    //newLastExp.Clear();
-                    List<int> newLastExp2 = new List<int>(lastExp.Skip(1).Take(d - 1));
-                    newLastExp2.Add(exp);
-                    lastExp.Clear();
-                    lastExp.AddRange(newLastExp2);
-                }
+                median = 0.5 * (median1 + median2);
+
             }
         }
         return notifications;
@@ -111,7 +143,9 @@ class Solution
 
         int[] expenditure = Array.ConvertAll(Console.ReadLine().Split(' '), expenditureTemp => Convert.ToInt32(expenditureTemp))
         ;
+        //DateTime start = DateTime.Now;
         int result = activityNotifications(expenditure, d);
+        //Console.WriteLine(DateTime.Now-start);
         //Console.Clear();
         Console.WriteLine(result);
 
